@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - David Studio</title>
+<style>
+body{font-family:Arial;background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#1c1c1c);background-size:400% 400%;animation:gradient 15s ease infinite;color:white;min-height:100vh;padding:20px;}
+@keyframes gradient{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
+h1{color:#00f2ff;}
+.user-card{background:rgba(255,255,255,0.1);padding:15px;margin:10px 0;border-radius:10px;}
+button{background:#00f2ff;color:#000;border:none;border-radius:20px;padding:10px 20px;cursor:pointer;}
+</style>
+</head>
+<body>
+<h1>Admin Panel</h1>
+<button onclick="logout()">Déconnecter</button>
+<div id="usersContainer"></div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabaseUrl = 'https://kginaltrpftesvkdcnrl.supabase.co';
+const supabaseKey = 'sb_publishable_s-m0a8IlJHLIrs9SjH3BWQ_3LrBCDhD';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const currentUserRole = localStorage.getItem("currentUserRole");
+if(currentUserRole !== "admin"){ alert("Accès interdit !"); window.location.href = "index.html"; }
+
+async function loadUsers(){
+    const { data, error } = await supabase.from('users').select('*');
+    if(error){ console.log(error.message); return; }
+
+    const container = document.getElementById("usersContainer");
+    container.innerHTML = "";
+    data.forEach(user => {
+        const div = document.createElement("div");
+        div.className = "user-card";
+        div.innerHTML = `<strong>Email :</strong> ${user.email} <br><strong>Mot de passe :</strong> ${user.password} <br><strong>Rôle :</strong> ${user.role}`;
+        container.appendChild(div);
+    });
+}
+
+function logout(){
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentUserRole");
+    window.location.href = "index.html";
+}
+
+loadUsers();
+</script>
+</body>
+</html>

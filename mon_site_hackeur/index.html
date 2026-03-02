@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Studio - Accueil</title>
+<style>
+:root{
+    --mainColor:#00f2ff;
+    --bgGradient1:#0f2027;
+    --bgGradient2:#203a43;
+    --bgGradient3:#2c5364;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+body{
+    font-size:16px;
+    line-height:1.5;
+    min-height:100vh;
+    color:white;
+    background:linear-gradient(-45deg,var(--bgGradient1),var(--bgGradient2),var(--bgGradient3),#1c1c1c);
+    background-size:400% 400%;
+    animation:gradient 15s ease infinite;
+    overflow-x:hidden;
+}
+@keyframes gradient{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 40px;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+    position:fixed;
+    width:100%;
+    z-index:100;
+}
+.logo{font-size:24px;font-weight:bold;letter-spacing:1px;}
+#nav-right button{
+    background:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:30px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.3s;
+    margin-left:15px;
+}
+#nav-right button:hover{transform:scale(1.05);}
+.hero{
+    height:90vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:20px;
+    animation:fadeIn 1.5s ease;
+}
+@keyframes fadeIn{
+    from{opacity:0;transform:translateY(30px);}
+    to{opacity:1;transform:translateY(0);}
+}
+.hero h1{font-size:48px;margin-bottom:20px;color:var(--mainColor);text-shadow:0 0 20px var(--mainColor);}
+.hero p{font-size:20px;opacity:0.8;margin-bottom:30px;}
+.btn{
+    background:var(--mainColor);
+    color:#000;
+    padding:15px 50px;
+    border-radius:40px;
+    font-weight:bold;
+    text-decoration:none;
+    transition:0.3s;
+    cursor:pointer;
+}
+.btn:hover{
+    transform:scale(1.1);
+    box-shadow:0 0 25px var(--mainColor);
+}
+.section{
+    padding:100px 40px 50px;
+    text-align:center;
+}
+.cards{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:40px;
+    margin-top:40px;
+}
+.card{
+    background:rgba(255,255,255,0.08);
+    padding:40px;
+    border-radius:20px;
+    width:280px;
+    backdrop-filter:blur(15px);
+    transition:0.4s;
+}
+.card:hover{
+    transform:translateY(-15px);
+    box-shadow:0 20px 40px rgba(0,0,0,0.5);
+}
+.user-info{
+    margin-top:20px;
+    font-size:18px;
+    color:var(--mainColor);
+}
+footer{
+    text-align:center;
+    padding:40px;
+    background:rgba(0,0,0,0.5);
+}
+@media(max-width:768px){
+    .hero h1{font-size:32px;}
+    .hero p{font-size:16px;}
+    .btn{width:80%; padding:12px 30px;}
+    .cards{flex-direction:column;align-items:center;}
+    nav{flex-direction:column;gap:10px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+<div class="logo"> David Studio</div>
+<div id="nav-right"></div>
+</nav>
+
+<div class="hero">
+<h1>Bienvenue chez David Studio</h1>
+<p>Une plateforme digitale moderne conçue pour créer l'excellence.</p>
+<button class="btn" onclick="startNow()">Commencer maintenant</button>
+<div id="userInfo" class="user-info"></div>
+<div id="adminBtn"></div>
+</div>
+
+<section class="section">
+<h2>Pourquoi nous choisir ?</h2>
+<div class="cards">
+<div class="card">
+<h3>⚡ Performance</h3>
+<p>Technologie rapide et optimisée.</p>
+</div>
+<div class="card">
+<h3>🔐 Sécurité</h3>
+<p>Protection avancée des utilisateurs.</p>
+</div>
+<div class="card">
+<h3>📊 Innovation</h3>
+<p>Interface moderne et intuitive.</p>
+</div>
+</div>
+</section>
+
+<footer>
+© 2026 David Studio - Tous droits réservés
+</footer>
+
+<script>
+const currentUser = localStorage.getItem("currentUser");
+const currentUserRole = localStorage.getItem("currentUserRole");
+const navRight = document.getElementById("nav-right");
+const userInfo = document.getElementById("userInfo");
+const adminBtn = document.getElementById("adminBtn");
+
+if(currentUser){
+    navRight.innerHTML = '<button onclick="logout()">Déconnecter</button>';
+    userInfo.innerHTML = "Connecté en tant que : <b>"+currentUser+"</b>";
+} else{
+    navRight.innerHTML = '<button onclick="goLogin()">Login</button>';
+}
+
+function startNow(){
+    if(currentUser){window.location.href="studio.html";}
+    else{window.location.href="login2.html";}
+}
+
+// Afficher bouton Admin seulement si admin
+if(currentUserRole === "admin"){
+    adminBtn.innerHTML = '<button class="btn" onclick="goAdmin()">Panel Admin</button>';
+}
+
+function goAdmin(){
+    window.location.href = "admin.login.html";
+}
+
+function goLogin(){window.location.href="login2.html";}
+function logout(){localStorage.removeItem("currentUser"); localStorage.removeItem("currentUserRole"); window.location.reload();}
+</script>
+
+</body>
+</html>

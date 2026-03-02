@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>David Studio - Mobile Ready</title>
+
+<style>
+:root{
+    --mainColor:#00f2ff;
+    --bgGradient1:#0a0f1c;
+    --bgGradient2:#111a2e;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+body{
+    font-size:16px;
+    line-height:1.5;
+    background:linear-gradient(135deg,var(--bgGradient1),var(--bgGradient2));
+    color:white;
+    overflow-x:hidden;
+    height:100vh;
+}
+
+/* CANVAS PARTICULES */
+canvas{
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:-1;
+}
+
+/* NAVBAR */
+nav{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    background:rgba(0,0,0,0.4);
+    backdrop-filter:blur(10px);
+}
+.logo{font-size:22px;font-weight:bold;letter-spacing:1px;}
+#menuItems{display:none;flex-direction:column;gap:10px;}
+nav button{background:white;border:none;padding:10px 20px;border-radius:30px;cursor:pointer;font-weight:bold;transition:0.3s;margin-top:5px;}
+nav button:hover{transform:scale(1.05);}
+
+/* HERO */
+.hero{
+    text-align:center;
+    padding:20px;
+}
+.hero h1{font-size:32px;color:var(--mainColor);text-shadow:0 0 20px var(--mainColor);margin-bottom:20px;}
+.hero p{opacity:0.8;margin-bottom:20px;}
+.btn{background:var(--mainColor);color:black;padding:15px 40px;border-radius:30px;font-weight:bold;transition:0.3s;cursor:pointer;width:80%;max-width:300px;}
+.btn:hover{transform:scale(1.05);box-shadow:0 0 25px var(--mainColor);}
+
+/* CARDS */
+.cards{display:flex;flex-direction:column;align-items:center;gap:20px;margin-top:20px;}
+.card{background:rgba(255,255,255,0.08);padding:20px;border-radius:15px;width:90%;max-width:350px;backdrop-filter:blur(15px);transition:0.4s;}
+.card:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.5);}
+
+/* BOOT SCREEN */
+#bootScreen{position:fixed;width:100%;height:100%;background:black;color:var(--mainColor);display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:22px;z-index:9999;}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- BOOT SCREEN -->
+<div id="bootScreen">
+    ⚡ David Studio OS
+    <br><br>
+    <span id="loadingText">Initialisation...</span>
+</div>
+
+<nav>
+<div class="logo">🚀 David Studio</div>
+<button id="menuBtn">☰ Menu</button>
+<div id="menuItems">
+    <button onclick="goLogin()">Login</button>
+    <button onclick="showRanking()">🏆 Classement</button>
+    <button onclick="showChat()">💬 Chat</button>
+    <button onclick="changeTheme()">🎨 Thème</button>
+</div>
+</nav>
+
+<div id="content" class="hero">
+    <h1>Bienvenue chez David Studio</h1>
+    <p>Le Studio Futuriste de Création & Partage</p>
+    <button class="btn" onclick="startNow()">Commencer maintenant</button>
+</div>
+
+<script>
+// ---------------------- BOOT ----------------------
+let bootMessages = [
+    "Chargement du système...",
+    "Connexion aux serveurs...",
+    "Activation modules...",
+    "Bienvenue dans David Studio"
+];
+let i=0;
+let bootInterval=setInterval(()=>{
+    document.getElementById("loadingText").innerText=bootMessages[i];
+    i++;
+    if(i>=bootMessages.length){
+        clearInterval(bootInterval);
+        setTimeout(()=>{document.getElementById("bootScreen").style.display="none";},800);
+    }
+},1000);
+
+// ---------------------- PARTICULES ----------------------
+const canvas=document.getElementById("particles");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+window.addEventListener("resize",()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
+
+let particlesArray=[];
+class Particle{
+    constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*2+1;this.speedX=Math.random()*0.5-0.25;this.speedY=Math.random()*0.5-0.25;}
+    update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x<0||this.x>canvas.width)this.speedX*=-1;if(this.y<0||this.y>canvas.height)this.speedY*=-1;}
+    draw(){
+        const color = getComputedStyle(document.documentElement).getPropertyValue('--mainColor') || "#00f2ff";
+        ctx.fillStyle = color.trim();
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = color.trim();
+        ctx.beginPath();
+        ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+        ctx.fill();
+    }
+}
+function initParticles(){particlesArray=[];for(let i=0;i<100;i++){particlesArray.push(new Particle());}}
+function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particlesArray.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateParticles);}
+initParticles();animateParticles();
+
+// ---------------------- UTIL ----------------------
+const currentUser = localStorage.getItem("currentUser");
+
+// NAV MENU BURGER
+document.getElementById("menuBtn").addEventListener("click",()=>{
+    let menu=document.getElementById("menuItems");
+    menu.style.display=(menu.style.display==="none"?"flex":"none");
+});
+
+// START NOW BUTTON
+function startNow(){
+    if(currentUser){window.location.href="project.html";} // redirection correcte
+    else{window.location.href="login2.html";}
+}
+
+function goLogin(){window.location.href="login2.html";}
+
+// ---------------------- THEME ----------------------
+function changeTheme(){
+    let themes=["#00f2ff","#ff00ff","#00ff88","#ffaa00"];
+    let random=themes[Math.floor(Math.random()*themes.length)];
+    document.documentElement.style.setProperty('--mainColor',random);
+    alert("Thème changé ⚡");
+}
+
+// ---------------------- RANKING ----------------------
+function showRanking(){
+    let users=JSON.parse(localStorage.getItem("allUsers"))||[];
+    let ranking=[];
+    users.forEach(u=>{let xp=parseInt(localStorage.getItem("xp_"+u))||0;ranking.push({user:u,xp:xp});});
+    ranking.sort((a,b)=>b.xp-a.xp);
+    let html=`<div class="card"><h2>Classement Global 🏆</h2>`;
+    ranking.forEach((r,i)=>{html+=`<div>${i+1}. ${r.user} - ${r.xp} XP</div>`;});
+    html+=`</div>`;document.getElementById("content").innerHTML=html;
+}
+
+// ---------------------- CHAT ----------------------
+function showChat(){
+    let messages = JSON.parse(localStorage.getItem("globalChat"))||[];
+    let html=`<div class="card"><h2>Chat Global 💬</h2><div id="chatBox" style="height:300px;overflow:auto;margin-bottom:10px;">`;
+    html+=messages.map(m=>`<div><b>${m.user}</b>: ${m.text}</div>`).join("");
+    html+=`</div><input type="text" id="chatInput" placeholder="Message..." style="width:70%;"><button class="btn" onclick="sendMessage()">Envoyer</button></div>`;
+    document.getElementById("content").innerHTML=html;
+}
+
+function sendMessage(){
+    let input=document.getElementById("chatInput");
+    if(!input.value) return;
+    let messages=JSON.parse(localStorage.getItem("globalChat"))||[];
+    messages.push({user:currentUser,text:input.value});
+    localStorage.setItem("globalChat",JSON.stringify(messages));
+    showChat();
+}
+</script>
+
+</body>
+</html>
