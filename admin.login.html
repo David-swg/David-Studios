@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -23,9 +25,6 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabaseUrl = 'https://kginaltrpftesvkdcnrl.supabase.co';
 const supabaseKey = 'sb_publishable_s-m0a8IlJHLIrs9SjH3BWQ_3LrBCDhD';
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-const currentUserRole = localStorage.getItem("currentUserRole");
-if(currentUserRole !== "admin"){ alert("Accès interdit !"); window.location.href = "index.html"; }
 
 async function loadUsers(){
     const { data, error } = await supabase.from('users').select('*');
