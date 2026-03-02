@@ -1,0 +1,37 @@
+/* style.css */
+
+/* Page normale */
+body.normal {
+  background-color: #111; /* fond noir foncé */
+  color: #fff;           /* texte blanc */
+  font-family: Arial, sans-serif;
+  text-align: center;
+  padding-top: 50px;
+}
+
+/* Page hacker /admin.login */
+body.hacker {
+  background-color: black;
+  color: #0f0;           /* texte vert style hacker */
+  font-family: monospace;
+  text-align: center;
+  padding-top: 50px;
+}
+
+input {
+  background-color: black;
+  color: #0f0;
+  border: 1px solid #0f0;
+  font-family: monospace;
+  padding: 5px;
+  margin-top: 10px;
+}
+
+button {
+  background-color: #0f0;
+  color: black;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}

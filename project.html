@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David Studio - Mini GitHub</title>
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f5f5f5;
+}
+nav{
+  display:flex;
+  justify-content:space-between;
+  padding:20px 40px;
+  background:#24292e;
+  color:white;
+}
+nav h2{margin:0;color:#00f2ff;}
+button,.btn{
+  padding:8px 16px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  background:#0366d6;
+  color:white;
+  font-weight:bold;
+  transition:0.2s;
+}
+button:hover,.btn:hover{opacity:0.8;}
+#mainSection{padding:40px;}
+.project-card{
+  background:white;
+  padding:15px;
+  margin:15px 0;
+  border-radius:10px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.2);
+}
+.project-card h3{margin:0;color:#0366d6;}
+.file-list button{
+  margin:5px;
+  padding:5px 10px;
+  background:#28a745;
+  color:white;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+.like-btn{background:#ff4081;}
+</style>
+</head>
+<body>
+
+<nav>
+<h2>David Studio</h2>
+<div id="nav-right"></div>
+</nav>
+
+<div id="mainSection"></div>
+
+<script>
+const currentUser = localStorage.getItem("currentUser");
+const navRight = document.getElementById("nav-right");
+const mainSection = document.getElementById("mainSection");
+
+if(currentUser){
+  navRight.innerHTML = '<button onclick="logout()">Déconnecter</button>';
+  showDashboard();
+}else{
+  navRight.innerHTML = '<button onclick="goLogin()">Login</button>';
+  showLanding();
+}
+
+function goLogin(){ window.location.href="login2.html"; }
+function logout(){ localStorage.removeItem("currentUser"); window.location.reload(); }
+
+function showLanding(){
+  mainSection.innerHTML=`
+  <h1>Bienvenue chez <span style="color:#0366d6">David Studio</span></h1>
+  <p>Mini GitHub social</p>
+  <a href="login2.html" class="btn">Commencer maintenant</a>
+  `;
+}
+
+function showDashboard(){
+  let allProjects = JSON.parse(localStorage.getItem("allProjects")) || [];
+
+  mainSection.innerHTML=`
+  <h1>Dashboard</h1>
+  <p>Connecté en tant que <b>${currentUser}</b></p>
+
+  <h3>Créer un projet</h3>
+  <input id="projectName" placeholder="Nom du projet" style="padding:10px;border-radius:10px;border:1px solid #ccc;">
+  <input type="file" id="fileInput" multiple style="margin-top:10px;">
+  <br><br>
+  <button onclick="addProject()">Ajouter Projet</button>
+
+  <h3>Projets publics</h3>
+  <div id="projectList"></div>
+  `;
+
+  renderProjects();
+}
+
+function addProject(){
+  const name = document.getElementById("projectName").value.trim();
+  const files = document.getElementById("fileInput").files;
+  if(!name || files.length===0){ alert("Nom et fichiers obligatoires"); return; }
+
+  let allProjects = JSON.parse(localStorage.getItem("allProjects")) || [];
+  let projectFiles=[];
+
+  Array.from(files).forEach(f=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      projectFiles.push({filename:f.name, content:e.target.result});
+      if(projectFiles.length===files.length){
+        allProjects.push({name,author:currentUser,files:projectFiles,likes:0,likedBy:[]});
+        localStorage.setItem("allProjects",JSON.stringify(allProjects));
+        showDashboard();
+      }
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+function renderProjects(){
+  let allProjects = JSON.parse(localStorage.getItem("allProjects")) || [];
+  const list = document.getElementById("projectList");
+  if(allProjects.length===0){ list.innerHTML="<p>Aucun projet public.</p>"; return; }
+
+  list.innerHTML = allProjects.map((p,i)=>`
+    <div class="project-card">
+      <h3>${p.name}</h3>
+      <p>Auteur: ${p.author}</p>
+      <p>Likes: <span id="like-count-${i}">${p.likes}</span> 
+      <button class="like-btn" onclick="likeProject(${i})">❤️</button></p>
+      <div class="file-list">
+        ${p.files.map((f,j)=>`<button onclick="downloadFile(${i},${j})">${f.filename}</button>`).join(' ')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function downloadFile(projIndex,fileIndex){
+  let allProjects = JSON.parse(localStorage.getItem("allProjects"));
+  const file = allProjects[projIndex].files[fileIndex];
+  const a = document.createElement('a');
+  a.href = file.content;
+  a.download = file.filename;
+  a.click();
+}
+
+function likeProject(index){
+  let allProjects = JSON.parse(localStorage.getItem("allProjects"));
+  let project = allProjects[index];
+  if(!project.likedBy.includes(currentUser)){
+    project.likes++;
+    project.likedBy.push(currentUser);
+    localStorage.setItem("allProjects",JSON.stringify(allProjects));
+    document.getElementById(`like-count-${index}`).innerText = project.likes;
+  }else{
+    alert("Vous avez déjà liké ce projet !");
+  }
+}
+</script>
+
+</body>
+</html>
